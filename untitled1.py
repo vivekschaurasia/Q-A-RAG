@@ -25,7 +25,7 @@ text_splitter = CharacterTextSplitter(separator="\n", chunk_size=1000, chunk_ove
 all_chunks = [chunk for doc in news_documents for chunk in text_splitter.split_text(doc)]
 
 # Step 3: Load Embeddings
-embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", api_key="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")
+embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", api_key="Your API Key")
 
 # Generate embeddings for each chunk
 chunk_embeddings = embeddings.embed_documents(all_chunks)
@@ -61,10 +61,10 @@ def retrieve_similar_chunks(query, k=5):
     if query_embedding.shape != (1, embedding_dim):
         query_embedding = query_embedding.reshape(1, embedding_dim)
     
-    # Perform the search
+    # The search
     distances, indices = index.search(query_embedding, k)
     
-    # Filter results to ensure indices are within bounds and meet the distance threshold
+    # Filter results 
     relevant_chunks = [
         all_chunks[i] for i in indices[0] 
         if i < len(all_chunks) and distances[0][indices[0].tolist().index(i)] < 0.7
@@ -76,7 +76,7 @@ def retrieve_similar_chunks(query, k=5):
 
 # Step 6: Define the QA Function
 def answer_question(query):
-    # Retrieve relevant documents based on the query
+    # Retrieve relevant documents
     relevant_docs = retrieve_similar_chunks(query)
 
     # Combine the query with relevant document content
@@ -88,19 +88,19 @@ def answer_question(query):
         + "\n\nIf the answer is not found in the documents, respond with 'I'm not sure'."
     )
 
-    # Create the input messages for the language model
+    
     messages = [
         SystemMessage(content="You are a helpful assistant for answering questions based on news documents."),
         HumanMessage(content=combined_input),
     ]
 
-    # Use the ChatOpenAI model to generate the answer
+    # ChatOpenAI model to generate the answer
     result = llm.invoke(messages)
     
     return result.content
 
 # Step 7: Create the LLM Model
-llm = ChatOpenAI(model="gpt-4o", api_key="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")
+llm = ChatOpenAI(model="gpt-4o", api_key="Your API Key")
 
 # Step 8: Test the QA Bot with a Sample Query
 query = input("What is your query? ").lower()
