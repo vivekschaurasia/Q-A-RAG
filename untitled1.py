@@ -8,9 +8,8 @@ from dotenv import load_dotenv
 
 
 # Step 1: Load and Preprocess News Articles
-folder_path = "C:/Users/vivek/OneDrive/Desktop/langchain/news_data"
+folder_path = "news_data path"
 
-# Read all text files and store them in a list
 documents = [
     open(os.path.join(folder_path, filename), 'r', encoding='utf-8').read()
     for filename in os.listdir(folder_path) if filename.endswith(".txt")
@@ -31,7 +30,7 @@ embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", api_key="Your API 
 chunk_embeddings = embeddings.embed_documents(all_chunks)
 
 
-embedding_dim = len(chunk_embeddings[0])  # Get embedding dimension from the first embedding
+embedding_dim = len(chunk_embeddings[0]) 
 
 # Convert chunk_embeddings to a numpy array with float32 type
 chunk_embeddings_np = np.array(chunk_embeddings).astype("float32")
