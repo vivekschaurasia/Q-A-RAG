@@ -1,6 +1,3 @@
 # Q-A-RAG
-Q&amp;A RAG
+Q&amp;A RAG LOADING...
 
-
-
-Give me 2-3 days to upload the code
