@@ -4,10 +4,14 @@ import numpy as np
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
+
+
 from dotenv import load_dotenv
+load_dotenv()
 
+api_key = os.getenv("Your API Key")
 
-# Step 1: Load and Preprocess News Articles
+# Step 1: Loading and Preprocessing News Articles below
 folder_path = "news_data path"
 
 documents = [
@@ -16,54 +20,41 @@ documents = [
 ]
 
 # Filter out failed retrieval messages
-news_documents = [doc for doc in documents if doc != "Failed to retrieve the webpage."]
+news_documents = [i for i in documents if i != "Failed to retrieve the webpage."]
 
 # Step 2: Split Documents into Chunks
 text_splitter = CharacterTextSplitter(separator="\n", chunk_size=1000, chunk_overlap=200)
 
-all_chunks = [chunk for doc in news_documents for chunk in text_splitter.split_text(doc)]
+all_chunks = [ i for j in news_documents for i in text_splitter.split_text(j)]
 
 # Step 3: Load Embeddings
-embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", api_key="Your API Key")
+embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", api_key = api_key)
 
 # Generate embeddings for each chunk
 chunk_embeddings = embeddings.embed_documents(all_chunks)
 
-
 embedding_dim = len(chunk_embeddings[0]) 
-
 # Convert chunk_embeddings to a numpy array with float32 type
 chunk_embeddings_np = np.array(chunk_embeddings).astype("float32")
 
 
 # Step 4: Initialize FAISS Index
-index = faiss.IndexFlatL2(embedding_dim)  # L2 distance is used; you can choose other metrics
-index.add(chunk_embeddings_np)  # Add embeddings to the FAISS index
+index = faiss.IndexFlatL2(embedding_dim)
+index.add(chunk_embeddings_np) 
 
-"""
-# Step 5: Define the FAISS-Based Retriever
-def retrieve_similar_chunks(query, k=3):
-    #query_embedding = np.array([embeddings.embed_documents(query)]).astype("float32")
-    query_embedding = np.array([embeddings.embed_query(query)]).astype("float32")
-
-    distances, indices = index.search(query_embedding, k)
-    return [all_chunks[i] for i in indices[0] if distances[0][i] < 0.1]  # Using a threshold of 0.1
-"""
 
 
 # Step 5: Define the FAISS-Based Retriever
 def retrieve_similar_chunks(query, k=5):
-    # Embed the query and ensure it has the correct shape for FAISS
     query_embedding = np.array(embeddings.embed_documents([query])).astype("float32")
     
-    # Check if query_embedding has shape (1, embedding_dim)
     if query_embedding.shape != (1, embedding_dim):
         query_embedding = query_embedding.reshape(1, embedding_dim)
     
-    # The search
+    # The search (By NF)
     distances, indices = index.search(query_embedding, k)
     
-    # Filter results 
+    # Filtering results 
     relevant_chunks = [
         all_chunks[i] for i in indices[0] 
         if i < len(all_chunks) and distances[0][indices[0].tolist().index(i)] < 0.7
@@ -72,8 +63,7 @@ def retrieve_similar_chunks(query, k=5):
     return relevant_chunks
 
 
-
-# Step 6: Define the QA Function
+# Step 6: QA Function
 def answer_question(query):
     # Retrieve relevant documents
     relevant_docs = retrieve_similar_chunks(query)
@@ -93,20 +83,19 @@ def answer_question(query):
         HumanMessage(content=combined_input),
     ]
 
-    # ChatOpenAI model to generate the answer
+    # Generating the answer via ChatOpenAI
     result = llm.invoke(messages)
     
     return result.content
 
-# Step 7: Create the LLM Model
-llm = ChatOpenAI(model="gpt-4o", api_key="Your API Key")
+# Step 7
+llm = ChatOpenAI(model="gpt-4o", api_key = api_key)
 
 # Step 8: Test the QA Bot with a Sample Query
 query = input("What is your query? ").lower()
 
 while query != "exit":
     answer = answer_question(query)
-    # Display the answer
     print("\n--- Answer ---")
     print(answer)
     query = input("What is your query? ").lower()
