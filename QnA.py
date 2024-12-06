@@ -39,7 +39,7 @@ chunk_embeddings_np = np.array(chunk_embeddings).astype("float32")
 
 
 # Step 4: Initialize FAISS Index
-index = faiss.IndexFlatL2(embedding_dim)
+index = faiss.IndexFlatL2(embedding_dim) #Previusly I used chromaDB
 index.add(chunk_embeddings_np) 
 
 
