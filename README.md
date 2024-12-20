@@ -8,7 +8,7 @@ This project demonstrates the implementation of a News Q&A bot using Retrieval-A
 ---
 
 ## Author
-
+ 
 **Vivek Santosh Chaurasia**  
 [Medium Blog](https://medium.com/@vivekschaurasia/building-a-news-q-a-bot-a-step-by-step-guide-to-real-time-retrieval-augmented-generation-rag-783630c580ab)  
 ---
