@@ -6,7 +6,7 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv 
 load_dotenv()
 
 api_key = os.getenv("Your API Key")
