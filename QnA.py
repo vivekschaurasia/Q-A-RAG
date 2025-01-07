@@ -7,7 +7,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 
 
 from dotenv import load_dotenv 
-load_dotenv()
+load_dotenv() #Loading the environmnet
 
 api_key = os.getenv("Your API Key")
 
